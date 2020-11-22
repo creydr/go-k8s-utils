@@ -9,6 +9,7 @@ import (
 	ktesting "k8s.io/client-go/testing"
 )
 
+// SecretDataReactor sets the secret.Data field based on the values from secret.StringData
 func SecretDataReactor(action ktesting.Action) (bool, runtime.Object, error) {
 	secret, ok := action.(ktesting.CreateAction).GetObject().(*v1.Secret)
 	if !ok {
