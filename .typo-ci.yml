@@ -1,0 +1,12 @@
+dictionaries:
+- en
+
+excluded_files:
+- .github/workflows/*
+- go.mod
+- go.sum
+- .gitignore
+- .typo-ci.yml
+
+excluded_words:
+- typoci
