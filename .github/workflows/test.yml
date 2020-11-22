@@ -1,0 +1,52 @@
+name: Test
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: ["1.15", "1.14", "1.13"]
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download go-junit-report
+        run: go get -u github.com/jstemmer/go-junit-report
+      - name: Test
+        run: go test ./... -v 2>&1 | go-junit-report > test-report-go${{ matrix.go-version }}.xml
+      - name: Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Unit Test Results (Go ${{ matrix.go-version }})
+          path: test-report-go${{ matrix.go-version }}.xml
+      - name: "Check test results"
+        run: cat test-report-go${{ matrix.go-version }}.xml
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: test
+    runs-on: ubuntu-latest
+    if: success() || failure()
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+      - name: "check uploads"
+        run: ls -la *
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1.5
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: artifacts/**/test-report-go*.xml
