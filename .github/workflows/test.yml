@@ -23,14 +23,21 @@ jobs:
       - name: Download go-junit-report
         run: go get -u github.com/jstemmer/go-junit-report
       - name: Test
-        run: go test ./... -v 2>&1 | go-junit-report > test-report-go${{ matrix.go-version }}.xml
+        run: go test ./... -v -coverprofile cover.out 2>&1 | go-junit-report > test-report-go${{ matrix.go-version }}.xml
       - name: Upload Unit Test Results
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: Unit Test Results (Go ${{ matrix.go-version }})
           path: test-report-go${{ matrix.go-version }}.xml
-      - name: "Check test results"
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./cover.out
+          name: codecov go{{ matrix.go-version }}
+          verbose: true
+      - name: Check test results
         run: cat test-report-go${{ matrix.go-version }}.xml
   publish-test-results:
     name: "Publish Unit Tests Results"
@@ -42,8 +49,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: artifacts
-      - name: "check uploads"
-        run: ls -la *
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1.5
         with:
