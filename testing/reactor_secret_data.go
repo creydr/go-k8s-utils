@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"encoding/base64"
 	"fmt"
 
 	v1 "k8s.io/api/core/v1"
@@ -22,8 +21,7 @@ func SecretDataReactor(action ktesting.Action) (bool, runtime.Object, error) {
 		}
 
 		for k, v := range secret.StringData {
-			secret.Data[k] = make([]byte, base64.StdEncoding.EncodedLen(len(v)))
-			base64.StdEncoding.Encode(secret.Data[k], []byte(v))
+			secret.Data[k] = []byte(v)
 		}
 	}
 

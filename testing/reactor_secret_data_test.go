@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"encoding/base64"
 	"testing"
 
 	v1 "k8s.io/api/core/v1"
@@ -39,13 +38,8 @@ func TestSecretDataReactor(t *testing.T) {
 		return
 	}
 
-	val1decoded := make([]byte, base64.StdEncoding.DecodedLen(len(val1)))
-	lenVal1, _ := base64.StdEncoding.Decode(val1decoded, val1)
-	val2decoded := make([]byte, base64.StdEncoding.DecodedLen(len(val2)))
-	lenVal2, _ := base64.StdEncoding.Decode(val2decoded, val2)
-
-	if string(val1decoded[:lenVal1]) != secret.StringData["key1"] || string(val2decoded[:lenVal2]) != secret.StringData["key2"] {
-		t.Errorf("SecretDataReactor() Did not encode correctly. Got %s and %s, but expected %s and %s", string(val1decoded[:lenVal1]), secret.StringData["key1"], string(val2decoded[:lenVal2]), secret.StringData["key2"])
+	if string(val1) != secret.StringData["key1"] || string(val2) != secret.StringData["key2"] {
+		t.Errorf("SecretDataReactor() Did not set secret.Data field correctly. Got %s and %s, but expected %s and %s", string(val1), secret.StringData["key1"], string(val2), secret.StringData["key2"])
 		return
 	}
 
