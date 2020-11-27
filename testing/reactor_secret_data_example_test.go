@@ -28,5 +28,5 @@ func ExampleSecretDataReactor() {
 	fmt.Printf("secret.Data[\"my-key\"]: %s", string(createdSecret.Data["my-key"])) //remember: the secrets StringData field was set, not the Data field
 
 	// Output:
-	// secret.Data["my-key"]: bXktdmFsdWU=
+	// secret.Data["my-key"]: my-value
 }
